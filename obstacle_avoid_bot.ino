@@ -8,7 +8,7 @@
  *              an SPST switch to start it, and it is powered by  7.4v @ 3300mAh LIPO battery.
  */
 
-#define VERSION 1.0.0
+#define VERSION 1.0.1
  
 // Trigger and Echo pins per sensor (HC-SR04)
 #define TRIGGER_FRONT     22
@@ -20,8 +20,10 @@
 
 
 #define PING_MIN_DISTANCE 30  //Min distance from obstacle (30cm or ~12in) 
-#define DELAYTIME 500         //Wait time in between turns (500ms)
 
+#define DELAYTIME 250         //stops everything while the robot turns.
+                              //Increase to extend the turning time.
+                              //Note: the faster the speed, the more it turns at each time.      
 /*
  * Motor setup: PWM pins
  *    Left motors   -> Front: 8,9
@@ -29,7 +31,7 @@
  *    Right motors  -> Front: 7,6
  *                  -> Rear : 4,5
  * Note: since the motor pins are sent analog signals, 
- * they do not need to be initialized
+ * their pins do not need to be initialized
  */
 int motor_left[] = {8,9,10,11};  
 int motor_right[] = {7,6,5,4};
@@ -60,11 +62,11 @@ void setup() {
  * Returns:   	void
  */
 void loop() { 
-    if(front_sensor() < PING_MIN_DISTANCE){ 					//if something is in front of it, drive backwards and turn to whichever direction is clear
-      motors_backward();
-      delay(DELAYTIME);
-      if(right_sensor() < PING_MIN_DISTANCE) motors_left();
-      else if(left_sensor() < PING_MIN_DISTANCE) motors_right();         
+    if(front_sensor() < PING_MIN_DISTANCE){ 					//if something is in front of it, drive backwards and turn left
+        motors_backward();
+        delay(DELAYTIME);                             			//turn for this amount of time
+        motors_left();
+        delay(DELAYTIME);
     }else if(right_sensor() < PING_MIN_DISTANCE) motors_left(); //if the right sensor pings, turn left until clear
     
     else if(left_sensor() < PING_MIN_DISTANCE) motors_right(); //if the left sensor pings, turn right until clear
@@ -128,7 +130,7 @@ static long left_sensor(void){
  * Returns:  	void
  */
 void motors_forward(void) 
-{
+{ //both sided forward
   analogWrite(motor_left[0], speed);
   analogWrite(motor_left[1], 0);
   analogWrite(motor_left[2], speed);
@@ -141,7 +143,7 @@ void motors_forward(void)
 }
 
 void motors_backward(void) 
-{
+{ //both sides reversed
   analogWrite(motor_left[0], 0);
   analogWrite(motor_left[1], speed);
   analogWrite(motor_left[2], 0);
