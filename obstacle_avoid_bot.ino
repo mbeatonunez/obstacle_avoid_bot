@@ -3,8 +3,8 @@
  * Author:      Moises Beato Nunez
  * Date:        22 Feb 2018
  * Description: A simple robot that can endlessly roams an area while avoiding obstacle.
- *				The robot is controlled via an Arduino Mega, and uses 3 HC-SR04 Ultrasonic
- * 				to "see" in front of it. It uses a L983n v3 Dual H-Bridge to drive 4 DC motors,
+ *				      The robot is controlled via an Arduino Mega, and uses 3 HC-SR04 Ultrasonic
+ * 				      to "see" in front of it. It uses a L983n v3 Dual H-Bridge to drive 4 DC motors,
  *              an SPST switch to start it, and it is powered by  7.4v @ 3300mAh LIPO battery.
  */
 
@@ -52,21 +52,25 @@ void setup() {
 
 }
 /*
- * loop()    	Infinitively check and void obstacles
- * argument: 	void
+ * loop()    	  Infinitively check and void obstacles
+ * argument: 	  void
  * operation: 	The robot avoids obstacles by comparing the distance received by the sensor functions
- *				to the predefined minimum distance from any object. If the condition return true, the robot
- *				turn in the direction opposite to the sensor that detected the nearby object. For example,
- *				if the right sensor perceives a near by object, the robot turns left until the object is no longer 
- *				in range
+ *				      to the predefined minimum distance from any object. If the condition return true, the robot
+ *				      turn in the direction opposite to the sensor that detected the nearby object. For example,
+ *				      if the right sensor perceives a near by object, the robot turns left until the object is no longer 
+ *				      in range
  * Returns:   	void
  */
 void loop() { 
     if(front_sensor() < PING_MIN_DISTANCE){ 					//if something is in front of it, drive backwards and turn left
         motors_backward();
-        delay(DELAYTIME);                             			//turn for this amount of time
+        delay(DELAYTIME);                             //turn for this amount of time
         motors_left();
         delay(DELAYTIME);
+        if(left_sensor() < PING_MIN_DISTANCE){        //if the left is occupied, turn right  
+          motors_right();
+          delay(DELAYTIME);
+        }
     }else if(right_sensor() < PING_MIN_DISTANCE) motors_left(); //if the right sensor pings, turn left until clear
     
     else if(left_sensor() < PING_MIN_DISTANCE) motors_right(); //if the left sensor pings, turn right until clear
@@ -122,12 +126,12 @@ static long left_sensor(void){
 
 
 /*
- * motors_xxxx() moves robot in the desired direction
- * argument:    void
- * operation:  	Send a PWM signal to the positive terminal of the DC motor to engage it,
- *				or send a PWM signal to the negative terminal to reverse the motion. Send
- *				zeros to all the terminals to make the motors stop.
- * Returns:  	void
+ * motors_xxxx()  moves robot in the desired direction
+ * argument:      void
+ * operation:  	  Send a PWM signal to the positive terminal of the DC motor to engage it,
+ *				        or send a PWM signal to the negative terminal to reverse the motion. Send
+ *				        zeros to all the terminals to make the motors stop.
+ * Returns:  	    void
  */
 void motors_forward(void) 
 { //both sided forward
